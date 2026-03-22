@@ -77,6 +77,8 @@ tail -f gpu_guard.log
 # training stdout/stderr: training.log
 ```
 
+**Quota NFS su `/workspace`:** se `pip install` fallisce con “Disk quota exceeded”, crea la venv sul root overlay: `python3 -m venv /root/eubot_jr_venv` e `pip install --no-cache-dir -r requirements.txt` con `TMPDIR=/tmp`. `gpu_guard.sh` rileva automaticamente `/root/eubot_jr_venv/bin/python`.
+
 ### Soglie VRAM (opzionale)
 
 Variabili d’ambiente (default ragionevoli per dare priorità a img/video):

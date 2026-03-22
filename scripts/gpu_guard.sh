@@ -23,15 +23,20 @@ cd "$WORKDIR" || exit 1
 POLL_SEC="${POLL_SEC:-30}"
 # Default thresholds assume a shared Pod where ComfyUI/SD/WebUI already reserve several GiB when "idle".
 # Tune for your machine: RESUME must be above baseline "other" VRAM; PAUSE should be lower than a heavy img/video spike.
-PAUSE_OTHER_MB="${PAUSE_OTHER_MB:-14000}"
-RESUME_OTHER_MB="${RESUME_OTHER_MB:-11000}"
+# Defaults tuned for shared pods where SD/WebUI already uses ~18-22 GiB when idle.
+# Lower RESUME than baseline "other" MiB => training never starts; raise RESUME (e.g. 24000) if needed.
+PAUSE_OTHER_MB="${PAUSE_OTHER_MB:-31000}"
+RESUME_OTHER_MB="${RESUME_OTHER_MB:-24000}"
 STABLE_SEC="${STABLE_SEC:-60}"
 TRAINING_LOG="${TRAINING_LOG:-$WORKDIR/training.log}"
 
 # Prefer project venv (RunPod / Debian often blocks system pip — use: python3 -m venv .venv)
+# If NFS quota blocks .venv under WORKDIR, install deps to /root/eubot_jr_venv (root overlay).
 if [[ -z "${PYTHON_CMD:-}" ]]; then
   if [[ -x "$WORKDIR/.venv/bin/python" ]]; then
     PYTHON_CMD="$WORKDIR/.venv/bin/python"
+  elif [[ -x "/root/eubot_jr_venv/bin/python" ]]; then
+    PYTHON_CMD="/root/eubot_jr_venv/bin/python"
   else
     PYTHON_CMD="python"
   fi
