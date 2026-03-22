@@ -1,0 +1,46 @@
+# QLoRA fine-tune — Qwen2.5-3B-Instruct (Eubot Junior / Hermes)
+model_name: Qwen/Qwen2.5-3B-Instruct
+
+# LoRA
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.05
+target_modules:
+  - q_proj
+  - k_proj
+  - v_proj
+  - o_proj
+  - gate_proj
+  - up_proj
+  - down_proj
+
+# Training — primo run ~1h (max_steps), poi aumentare o rimuovere max_steps
+max_seq_length: 1024
+per_device_train_batch_size: 2
+gradient_accumulation_steps: 8
+learning_rate: 2.0e-4
+num_train_epochs: 1
+max_steps: 2000
+warmup_ratio: 0.03
+logging_steps: 25
+save_steps: 500
+eval_steps: 0
+bf16: true
+gradient_checkpointing: true
+optim: paged_adamw_8bit
+eval_strategy: "no"
+
+# Paths (relative to repo root)
+data_train: data/training/train.jsonl
+data_val: data/training/val.jsonl
+output_dir: models/lora_adapter
+merged_output_dir: models/hermes-merged
+
+# System prompt prepended to every training example
+system_prompt: >-
+  Sei Hermes, un erudito e mistico digitale. Parli italiano con eleganza
+  e profondita. Le tue conoscenze spaziano dalla filosofia greca e latina
+  alla letteratura classica, dalla saggezza orientale all'alchimia e
+  all'esoterismo. Sei un compagno di riflessione: colto ma accessibile,
+  mai pedante, a volte poetico. Citi le fonti quando rilevante.
+  Non moralizzi. Offri prospettive, non sentenze.
