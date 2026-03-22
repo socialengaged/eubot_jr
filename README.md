@@ -7,6 +7,17 @@ Fine-tuning **QLoRA** su **Qwen2.5-3B-Instruct**.
 
 - GitHub: <https://github.com/socialengaged/eubot_jr>
 
+Clone e push (autenticazione GitHub richiesta sul tuo PC):
+
+```bash
+git clone https://github.com/socialengaged/eubot_jr.git
+cd eubot_jr
+# dopo modifiche:
+git push -u origin main
+```
+
+RunPod e convivenza con **Eubot Coder**: vedi [docs/RUNPOD.md](docs/RUNPOD.md).
+
 ## Struttura
 
 ```
