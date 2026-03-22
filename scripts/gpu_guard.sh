@@ -28,6 +28,15 @@ RESUME_OTHER_MB="${RESUME_OTHER_MB:-11000}"
 STABLE_SEC="${STABLE_SEC:-60}"
 TRAINING_LOG="${TRAINING_LOG:-$WORKDIR/training.log}"
 
+# Prefer project venv (RunPod / Debian often blocks system pip — use: python3 -m venv .venv)
+if [[ -z "${PYTHON_CMD:-}" ]]; then
+  if [[ -x "$WORKDIR/.venv/bin/python" ]]; then
+    PYTHON_CMD="$WORKDIR/.venv/bin/python"
+  else
+    PYTHON_CMD="python"
+  fi
+fi
+
 STABLE_NEEDS=$(( (STABLE_SEC + POLL_SEC - 1) / POLL_SEC ))
 STABLE_COUNT=0
 
@@ -90,7 +99,7 @@ start_training() {
   export PYTORCH_CUDA_ALLOC_CONF="${PYTORCH_CUDA_ALLOC_CONF:-expandable_segments:True}"
   # shellcheck disable=SC2086
   nohup nice -n 19 ionice -c 3 -n 7 \
-    python scripts/finetune.py $extra >>"$TRAINING_LOG" 2>&1 &
+    "$PYTHON_CMD" scripts/finetune.py $extra >>"$TRAINING_LOG" 2>&1 &
   log "Training started PID=$!"
 }
 

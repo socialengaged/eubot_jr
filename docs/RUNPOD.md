@@ -12,15 +12,15 @@
 cd /workspace
 git clone https://github.com/socialengaged/eubot_jr.git
 cd eubot_jr
-pip install -r requirements.txt
+python3 -m venv .venv && ./.venv/bin/pip install -U pip && ./.venv/bin/pip install -r requirements.txt
 
-python scripts/download_gutenberg.py
-python scripts/download_sacred.py
-python scripts/clean_text.py
-python scripts/build_dataset.py
+./.venv/bin/python scripts/download_gutenberg.py
+./.venv/bin/python scripts/download_sacred.py
+./.venv/bin/python scripts/clean_text.py
+./.venv/bin/python scripts/build_dataset.py
 
 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
-  nohup python scripts/finetune.py > training.log 2>&1 &
+  nohup ./.venv/bin/python scripts/finetune.py > training.log 2>&1 &
 tail -f training.log
 ```
 
@@ -60,13 +60,17 @@ Poi: `ssh images`
 cd /workspace
 git clone https://github.com/socialengaged/eubot_jr.git
 cd eubot_jr
-pip install -r requirements.txt
+python3 -m venv .venv
+./.venv/bin/pip install -U pip
+./.venv/bin/pip install -r requirements.txt
 chmod +x scripts/gpu_guard.sh
+# Usa sempre la venv per gli script:
+alias py='./.venv/bin/python'
 
-python scripts/download_gutenberg.py
-python scripts/download_sacred.py
-python scripts/clean_text.py
-python scripts/build_dataset.py
+./.venv/bin/python scripts/download_gutenberg.py
+./.venv/bin/python scripts/download_sacred.py
+./.venv/bin/python scripts/clean_text.py
+./.venv/bin/python scripts/build_dataset.py
 
 WORKDIR=/workspace/eubot_jr nohup bash scripts/gpu_guard.sh >> gpu_guard.log 2>&1 &
 tail -f gpu_guard.log
