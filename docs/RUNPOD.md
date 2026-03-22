@@ -77,15 +77,15 @@ tail -f gpu_guard.log
 
 Variabili d’ambiente (default ragionevoli per dare priorità a img/video):
 
-- `PAUSE_OTHER_MB` — se la VRAM usata da processi **diversi** dal training è >= questo valore (MiB), il training viene fermato con SIGTERM (checkpoint recenti ogni `save_steps`, default 250).
-- `RESUME_OTHER_MB` — per **avviare** o **riprendere**, la VRAM “altra” deve restare sotto questo valore per `STABLE_SEC` secondi.
+- `PAUSE_OTHER_MB` — se la VRAM usata da processi **diversi** dal training è >= questo valore (MiB), il training viene fermato con SIGTERM (checkpoint recenti ogni `save_steps`, default 250). Default script: **14000** (soglia “carico pesante” oltre baseline SD/ComfyUI).
+- `RESUME_OTHER_MB` — per **avviare** o **riprendere**, la VRAM “altra” deve restare **sotto** questo valore per `STABLE_SEC` secondi. Default script: **11000** (deve essere **sopra** la VRAM “idle” dei servizi img/video sul Pod, altrimenti il guard non parte mai).
 - `POLL_SEC` — intervallo di polling (default 30).
 - `STABLE_SEC` — secondi di GPU “calma” prima di ripartire (default 60).
 
-Esempio (più aggressivo nel cedere la GPU):
+Esempio (Pod quasi vuoto, poca VRAM occupata da altri processi):
 
 ```bash
-export PAUSE_OTHER_MB=3000 RESUME_OTHER_MB=2000 POLL_SEC=20 STABLE_SEC=90
+export PAUSE_OTHER_MB=4000 RESUME_OTHER_MB=3000 POLL_SEC=20 STABLE_SEC=90
 WORKDIR=/workspace/eubot_jr nohup bash scripts/gpu_guard.sh >> gpu_guard.log 2>&1 &
 ```
 

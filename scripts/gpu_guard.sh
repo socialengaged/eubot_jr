@@ -21,8 +21,10 @@ WORKDIR="${WORKDIR:-$(cd "${SCRIPT_DIR}/.." && pwd)}"
 cd "$WORKDIR" || exit 1
 
 POLL_SEC="${POLL_SEC:-30}"
-PAUSE_OTHER_MB="${PAUSE_OTHER_MB:-4000}"
-RESUME_OTHER_MB="${RESUME_OTHER_MB:-2800}"
+# Default thresholds assume a shared Pod where ComfyUI/SD/WebUI already reserve several GiB when "idle".
+# Tune for your machine: RESUME must be above baseline "other" VRAM; PAUSE should be lower than a heavy img/video spike.
+PAUSE_OTHER_MB="${PAUSE_OTHER_MB:-14000}"
+RESUME_OTHER_MB="${RESUME_OTHER_MB:-11000}"
 STABLE_SEC="${STABLE_SEC:-60}"
 TRAINING_LOG="${TRAINING_LOG:-$WORKDIR/training.log}"
 
