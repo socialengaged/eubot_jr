@@ -16,7 +16,7 @@ cd eubot_jr
 git push -u origin main
 ```
 
-RunPod e convivenza con **Eubot Coder**: vedi [docs/RUNPOD.md](docs/RUNPOD.md).
+RunPod e convivenza con **Eubot Coder** o **ComfyUI / video** sulla stessa GPU: vedi [docs/RUNPOD.md](docs/RUNPOD.md). Per cedere priorità a immagini e video, avvia il training con **`scripts/gpu_guard.sh`** (pausa automatica in base alla VRAM e ripresa con `--resume`).
 
 ## Struttura
 

@@ -34,3 +34,65 @@ pgrep -af finetune
 ```
 
 Se compare ancora loss / progress, **non** avviare Junior.
+
+## Pod "images" (GPU condivisa con ComfyUI / video)
+
+Su un Pod dove girano **generazione immagini o video** (es. ComfyUI), non lanciare il training “nudo” in concorrenza: usa **`scripts/gpu_guard.sh`** così il fine-tune si **mette in pausa** quando altri processi occupano troppa VRAM e **riprende con `--resume`** quando la GPU torna libera.
+
+### SSH (TCP diretto, esempio)
+
+Aggiungi in `~/.ssh/config` (Windows: `C:\Users\info\.ssh\config`):
+
+```
+Host images
+    HostName 213.173.103.227
+    Port 40181
+    User root
+    IdentityFile ~/.ssh/eubot_ed25519
+    StrictHostKeyChecking accept-new
+```
+
+Poi: `ssh images`
+
+### Setup e avvio con gpu_guard
+
+```bash
+cd /workspace
+git clone https://github.com/socialengaged/eubot_jr.git
+cd eubot_jr
+pip install -r requirements.txt
+chmod +x scripts/gpu_guard.sh
+
+python scripts/download_gutenberg.py
+python scripts/download_sacred.py
+python scripts/clean_text.py
+python scripts/build_dataset.py
+
+WORKDIR=/workspace/eubot_jr nohup bash scripts/gpu_guard.sh >> gpu_guard.log 2>&1 &
+tail -f gpu_guard.log
+# training stdout/stderr: training.log
+```
+
+### Soglie VRAM (opzionale)
+
+Variabili d’ambiente (default ragionevoli per dare priorità a img/video):
+
+- `PAUSE_OTHER_MB` — se la VRAM usata da processi **diversi** dal training è >= questo valore (MiB), il training viene fermato con SIGTERM (checkpoint recenti ogni `save_steps`, default 250).
+- `RESUME_OTHER_MB` — per **avviare** o **riprendere**, la VRAM “altra” deve restare sotto questo valore per `STABLE_SEC` secondi.
+- `POLL_SEC` — intervallo di polling (default 30).
+- `STABLE_SEC` — secondi di GPU “calma” prima di ripartire (default 60).
+
+Esempio (più aggressivo nel cedere la GPU):
+
+```bash
+export PAUSE_OTHER_MB=3000 RESUME_OTHER_MB=2000 POLL_SEC=20 STABLE_SEC=90
+WORKDIR=/workspace/eubot_jr nohup bash scripts/gpu_guard.sh >> gpu_guard.log 2>&1 &
+```
+
+### Log utili
+
+```bash
+tail -f /workspace/eubot_jr/gpu_guard.log
+tail -f /workspace/eubot_jr/training.log
+ls -la /workspace/eubot_jr/models/lora_adapter/
+```
